@@ -50,6 +50,7 @@ server.post('/api', (req, res) => {
     })
 })
 
+//DELETE existing account
 server.delete('/api/:id', (req, res) => {
   const id = Number(req.params.id)
 
@@ -74,6 +75,31 @@ server.delete('/api/:id', (req, res) => {
 
 })
 
+//UPDATE existing account
+server.put('/api/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const { body } = req
+
+  db('accounts')
+    .where({ id: id })
+    .update(body)
+    .then(response => {
+      if (response > 0) {
+        //if successfully update account, query db again and return updated object
+        db('accounts')
+          .where({ id })
+          .then(resp => {
+            res.status(200).json({ data: resp, message: 'successfully updated account' })
+          })
+      } else {
+        res.status(404).json({ message: 'could not find account by that id' })
+      }
+    })
+    .catch(error => {
+      res.status(500).json({ message: error })
+    })
+
+})
 
 
 
